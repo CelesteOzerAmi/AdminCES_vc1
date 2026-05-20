@@ -1,8 +1,13 @@
 package org.example;
 
 import java.util.Scanner;
+import java.util.spi.AbstractResourceBundleProvider;
 
 public class Main {
+
+
+    // https://github.com/CelesteOzerAmi/AdminCES_vc1 //
+
 
     public static Scanner scanner = new Scanner(System.in);
 
@@ -67,6 +72,14 @@ public class Main {
 
         System.out.print("Ingrese contraseña: ");
         usuario.setPassword(scanner.nextLine());
+
+        System.out.println("Confirme contraseña");
+        String passwordConfirmation = scanner.nextLine();
+
+        if(!passwordConfirmation.equals(usuario.getPassword())){
+            System.out.println("Contraseñas no coinciden :(");
+            return;
+        }
 
         System.out.print("Ingrese país: ");
         usuario.setCountry(scanner.nextLine());
