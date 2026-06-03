@@ -2,11 +2,11 @@ package org.example;
 
 public class Usuario {
 
-    private String name;
-    private String lastName;
-    private String email;
-    private String country;
-    private String password;
+    protected String name;
+    protected String lastName;
+    protected String email;
+    protected String country;
+    protected String password;
 
     public Usuario(String name, String lastName, String email, String country, String password){
         this.name = name;
@@ -15,6 +15,8 @@ public class Usuario {
         this.country = country;
         this.password = password;
     }
+
+    public Usuario(){}
 
     public String getName(){
         return this.name;
