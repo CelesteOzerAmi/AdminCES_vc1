@@ -12,3 +12,5 @@ B. Funcionalidades habiendo iniciado sesión.
   3. Ver usuarios: Permite ver usuarios registrados de admin o tester. Se visualizan todos los datos registrados de cada perfil.
   4. Eliminar usuario de tester: Permite eliminar un usuario de tester ya creado.
   5. Ver perfil: Permite ver el perfil propio, permitiendo editar datos. Restricciones: email a editar no puede existir en otro usuario. No permite modificar tipo de perfil. 
+
+<img width="4256" height="2016" alt="image" src="https://github.com/user-attachments/assets/c1f2e306-3f36-4627-8f89-36f40476ecdb" />
