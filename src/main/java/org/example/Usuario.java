@@ -1,6 +1,6 @@
 package org.example;
 
-public class Usuario {
+public abstract class Usuario {
 
     protected String name;
     protected String lastName;
@@ -16,7 +16,7 @@ public class Usuario {
         this.password = password;
     }
 
-    public Usuario(){}
+    public void cambiarContrasena(String nuevaContrasena, Usuario usuarioObjetivo){}
 
     public String getName(){
         return this.name;
@@ -58,4 +58,8 @@ public class Usuario {
         this.password = password;
     }
 
+
+    public String toString(){
+        return "";
+    }
 }

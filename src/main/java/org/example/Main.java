@@ -1,5 +1,6 @@
 package org.example;
 
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -31,6 +32,18 @@ public class Main {
                 case 3:
                     System.out.println("Ver usuarios");
                     SistemaUsuarios.verUsuarios();
+                    break;
+                case 4:
+                    System.out.println("Buscar usuario por email");
+                    SistemaUsuarios.buscarUsuarioPorEmail();
+                    break;
+                case 5:
+                    System.out.println("Buscar usuario por nombre");
+                    SistemaUsuarios.buscarUsuarioPorNombre();
+                    break;
+                case 6:
+                    System.out.println("Cambiar contraseña");
+                    SistemaUsuarios.ejecutarCambioDeContrasena();
                     break;
                 case 0:
                     System.out.println("Salir");
