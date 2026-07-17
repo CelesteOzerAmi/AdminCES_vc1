@@ -30,6 +30,6 @@ public class Tester extends Usuario{
     @Override
     public String toString(){
         return this.getName() + " " + this.getLastName() +  ", " + this.getEmail()
-                + ", " + this.getCountry() + ", " + this.getRol() + ".";
+                + ", " + this.getCountry() + ", tester " + this.getRol() + ".";
     }
 }

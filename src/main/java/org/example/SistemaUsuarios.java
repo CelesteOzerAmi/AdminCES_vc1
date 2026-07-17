@@ -17,13 +17,12 @@ public class SistemaUsuarios {
         usuariosList.add(new Admin("María", "Gonzalez", "maria.gonzalez@email.com", "Uruguay", "maria123"));
         usuariosList.add(new Admin("Diego", "Alvarez", "diego.alv@email.com", "Uruguay", "diego123"));
         usuariosList.add(new Tester("Martin", "Alvarez", "martin.alv@email.com", "Uruguay", "diego123", "junior"));
-        usuariosList.add(new Tester("Martin", "Alvarez", "martin.alv@email.com", "Uruguay", "diego123", "junior"));
-        usuariosList.add(new Tester("Martin", "Alvarez", "martin.alv@email.com", "Uruguay", "diego123", "junior"));
+        usuariosList.add(new Tester("Jose", "Alvarez", "jose.alv@email.com", "Uruguay", "diego123", "senior"));
+        usuariosList.add(new Tester("Juana", "Alvarez", "juana.alv@email.com", "Uruguay", "diego123", "junior"));
     }
 
-
     // *** registro *** //
-    public static void registrarUsuario() {
+    public static void registrarUsuario() throws EmailExisteException {
 
         String name = "";
         String lastName = "";
@@ -33,33 +32,94 @@ public class SistemaUsuarios {
 
         System.out.print("Ingrese nombre: ");
         name = scanner.nextLine();
+        while(name.isBlank()){
+            System.out.println("Nombre es un campo obligatorio");
+            System.out.print("Ingrese nombre: ");
+            name = scanner.nextLine();
+        }
 
         System.out.print("Ingrese apellido: ");
         lastName = scanner.nextLine();
+        while(lastName.isBlank()){
+            System.out.println("Apellido es un campo obligatorio");
+            System.out.print("Ingrese apellido: ");
+            lastName = scanner.nextLine();
+        }
 
         System.out.print("Ingrese email: ");
         email = scanner.nextLine();
 
-        System.out.print("Ingrese contraseña: ");
+        if(!email.contains("@") || !email.contains(".")){
+            System.out.println("Formato incorrecto. Reintente");
+            return;
+        }
+
+        String finalEmail = email;
+        Usuario userEmail = usuariosList.stream().filter(a -> a.getEmail().equalsIgnoreCase(finalEmail)).findFirst().orElse(null);
+        if(userEmail != null){
+            throw new EmailExisteException("Email ya se encuentra registrado");
+        }
+
+        System.out.print("Ingrese contraseña (minimo 8 caracteres): ");
         password = scanner.nextLine();
 
-        System.out.println("Confirme contraseña");
+        while(password.length() < 8){
+            System.out.println("Contraseña debe tener al menos 8 caracteres");
+            System.out.println("Ingrese contraseña");
+            password = scanner.nextLine();
+        }
+
+        System.out.print("Confirme contraseña: ");
         String passwordConfirmation = scanner.nextLine();
 
         if(!passwordConfirmation.equals(password)){
-            System.out.println("Contraseñas no coinciden :(");
+            System.out.println("Contraseñas no coinciden");
             return;
         }
 
         System.out.print("Ingrese país: ");
         country = scanner.nextLine();
 
-        usuariosList.add(new Admin(name, lastName, email, password, country));
+        // si usuario logueado es admin, se crea un usuario de tipo tester //
+        if(usuarioLogin instanceof Admin){
+            String rol = "";
+            while(rol.isBlank()){
+                System.out.println("Ingrese rol de usuario tester");
+                System.out.println("1. Junior | 2. Senior | 3. Líder | 0. Cancelar");
+                String option = scanner.nextLine();
+                switch (option){
+                    case "1":
+                        rol = "Junior";
+                        break;
+                    case "2":
+                        rol = "Senior";
+                        break;
+                    case "3":
+                        rol = "Lider";
+                        break;
+                    case "0":
+                        System.out.println("Operación cancelada");
+                        break;
+                    default:
+                        System.out.println("Opción incorrecta");
+                        break;
+                }
+                if(option.equals("0")){
+                    return;
+                }
+            }
+            System.out.println("Tester creado correctamente");
+            usuariosList.add(new Tester(name, lastName, email, country, password, rol));
+            return;
+        }
+
+        // si no existe usuario logueado, se crea usuario admin //
+        usuariosList.add(new Admin(name, lastName, email, country, password));
         System.out.println("Usuario registrado correctamente.");
     }
 
     // *** buscar usuario por email *** //
-    public static Usuario buscarUsuario(){
+    public static Usuario buscarUsuario() throws UsuarioNoEncontradoException{
         System.out.println("Ingrese email del usuario");
         System.out.println("0. Cancelar");
         String email = scanner.nextLine();
@@ -78,91 +138,66 @@ public class SistemaUsuarios {
                                                                                     .findFirst()
                                                                                     .orElse(null);
         if(usuario == null){
-            System.out.println("Usuario no encontrado");
+            throw new UsuarioNoEncontradoException("Usuario no encontrado");
         }
         return usuario;
     }
 
     // *** buscar usuario por email *** //
-    public static String buscarUsuarioPorEmail(){
-
+    public static void buscarUsuarioPorEmail() throws UsuarioNoEncontradoException {
+        if(usuarioLogin == null || usuarioLogin instanceof Tester){
+            System.out.println("Debe ser administrador para buscar usuarios");
+            return;
+        }
         Usuario usuario = buscarUsuario();
-        if(usuario != null){
-            return usuario.toString();
-        }
-        return "Usuario no encontrado";
+        System.out.println(usuario.toString());
+        return;
     }
-
-    // *** buscar usuario por nombre *** //
-    public static String buscarUsuarioPorNombre(){
-        System.out.println("Ingrese primer nombre del usuario");
-        System.out.println("0. Cancelar");
-        String nombre = scanner.nextLine();
-        while(nombre.isEmpty()){
-            System.out.println("Ingrese nombre del usuario");
-            System.out.println("0. Cancelar");
-            nombre = scanner.nextLine();
-        }
-        if(nombre.equals("0")){
-            System.out.println("Cancelando...");
-            return null;
-        }
-
-        String nombreBuscar = nombre;
-        List<Usuario> usuariosPorNombre = new ArrayList<>();
-        for(Usuario u : usuariosList){
-            if(u.getName().contains(nombreBuscar)){
-                usuariosPorNombre.add(u);
-            }
-        }
-
-        if(usuariosPorNombre.isEmpty()){
-            return "Usuario no encontrado";
-        }
-        return usuariosPorNombre.toString();
-    }
-
 
     // *** login *** //
-    public static void loginUsuario() {
+    public static void loginUsuario() throws UsuarioNoEncontradoException {
+
+        if(usuarioLogin != null){
+            System.out.println("Usuario ya logueado");
+            return;
+        }
 
         System.out.print("Ingrese email: ");
         String email = scanner.nextLine();
 
+        Usuario usuarioLog = usuariosList.stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+        if(usuarioLog == null){
+            throw new UsuarioNoEncontradoException("Usuario no registrado");
+        }
         System.out.print("Ingrese contraseña: ");
         String password = scanner.nextLine();
-
-        for (Usuario u : usuariosList) {
-            if(u.getEmail().equals(email)){
-                usuarioLogin = u;
-            }
-        }
-
-        if (usuarioLogin != null && email.equals(usuarioLogin.getEmail())
-                && password.equals(usuarioLogin.getPassword())) {
-
+        if(usuarioLog.getPassword().equals(password)){
+            usuarioLogin = usuarioLog;
             System.out.println("Login exitoso. Bienvenido " + usuarioLogin.getName());
-
-        } else {
-
-            System.out.println("Credenciales incorrectas.");
-
+        } else  {
+            System.out.println("Credenciales incorrectas");
         }
-    }
 
+    }
 
     // *** ver usuarios *** //
     public static void verUsuarios(){
+        if(usuarioLogin == null || usuarioLogin instanceof Tester){
+            System.out.println("Debe ser administrador para ver usuarios");
+            return;
+        }
         for (Usuario u : usuariosList) {
-            if(u != null){
-                System.out.println(u.getName() + " " + u.getLastName() + ", " + u.getEmail() + ", " + u.getCountry() + ". ");
+            if(u instanceof Admin){
+                System.out.println(u.toString() + " Admin");
+            } else if (u instanceof Tester){
+                System.out.println(u.toString());
             }
 
         }
     }
 
     // *** cambiar contraseña *** //
-    public static void ejecutarCambioDeContrasena() {
+    public static void ejecutarCambioDeContrasena() throws UsuarioNoEncontradoException {
         Usuario usuarioObjetivo = null;
 
         if(usuarioLogin != null){
@@ -171,25 +206,96 @@ public class SistemaUsuarios {
                 System.out.println("Usuario no encontrado.");
                 return;
             }
+            System.out.println("Ingrese nueva contraseña. Minimo 8 caracteres");
+            String nuevaContrasenia = "";
+            nuevaContrasenia = scanner.nextLine();
+
+            if(nuevaContrasenia.length() < 8){
+                System.out.println("Contraseña debe tener al menos 8 caracteres");
+                return;
+            }
+
+            System.out.println("Confirme contraseña");
+            String passwordConfirmation = scanner.nextLine();
+
+            if(!passwordConfirmation.equals(nuevaContrasenia)){
+                System.out.println("Contraseñas no coinciden");
+                return;
+            }
+
+            try {
+                usuarioLogin.cambiarContrasena(nuevaContrasenia, usuarioObjetivo);
+            } catch (SecurityException e) {
+                System.err.println("Error de permisos: " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Error del sistema: " + e.getMessage());
+            }
         }
 
-        System.out.println("Ingrese nueva contraseña");
-        String nuevaContrasenia = scanner.nextLine();
+        if(usuarioLogin == null){
+            System.out.println("Ingrese su email");
+            String email = scanner.nextLine();
+            Usuario usuarioEmail = usuariosList.stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+            if(usuarioEmail == null){
+                throw new UsuarioNoEncontradoException("Usuario no encontrado");
+            }
+            System.out.println("Confirme usuario");
+            System.out.println(usuarioEmail.toString());
+            System.out.println("¿Usuario es correcto? 1. Sí | 0. No");
+            if(!scanner.nextLine().equals("1")){
+                System.out.println("Operación cancelada");
+                return;
+            }
+            System.out.println("Ingrese nueva contraseña. Minimo 8 caracteres");
+            String nuevaContrasenia = scanner.nextLine();
 
-        System.out.println("Confirme contraseña");
-        String passwordConfirmation = scanner.nextLine();
+            if(nuevaContrasenia.length() < 8){
+                System.out.println("Contraseña debe tener al menos 8 caracteres");
+                return;
+            }
 
-        if(!passwordConfirmation.equals(nuevaContrasenia)){
-            System.out.println("Contraseñas no coinciden :(");
+            System.out.println("Confirme contraseña");
+            String passwordConfirmation = scanner.nextLine();
+
+            if(!passwordConfirmation.equals(nuevaContrasenia)){
+                System.out.println("Contraseñas no coinciden");
+                return;
+            }
+            usuarioEmail.cambiarContrasena(nuevaContrasenia, null);
+        }
+    }
+
+    // *** cambiar email *** //
+    public static void cambiarEmail() throws EmailExisteException {
+        if(usuarioLogin instanceof Admin){
+            System.out.println("Ingrese nuevo email");
+            String nuevoEmail = scanner.nextLine();
+            if(!nuevoEmail.contains("@") || !nuevoEmail.contains(".")){
+                System.out.println("Formato incorrecto. Reintente");
+                return;
+            }
+
+            String finalEmail = nuevoEmail;
+            Usuario adminEmail = usuariosList.stream().filter(a -> a.getEmail().equalsIgnoreCase(finalEmail)).findFirst().orElse(null);
+            if(adminEmail != null){
+                throw new EmailExisteException("Email ya se encuentra registrado");
+            }
+            System.out.println("Email cambiado correctamente");
+        } else {
+            System.out.println("Debe estar logueado para cambiar email");
+        }
+    }
+
+    // *** cerrar sesión *** //
+    public static void cerrarSesion(){
+        if(usuarioLogin == null){
+            System.out.println("Debe estar logueado para cerrar sesión");
             return;
         }
-
-        try {
-            usuarioLogin.cambiarContrasena(nuevaContrasenia, usuarioObjetivo);
-        } catch (SecurityException e) {
-            System.err.println("Error de Permisos: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Error del sistema: " + e.getMessage());
+        System.out.println("¿Confirmar cierre de sesión? 1. Confirmar | 0. Cancelar");
+        if(scanner.nextLine().equals("1")){
+            System.out.println("Cerrando sesión...");
+            usuarioLogin = null;
         }
     }
 }

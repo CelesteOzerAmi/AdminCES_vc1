@@ -16,7 +16,7 @@ public abstract class Usuario {
         this.password = password;
     }
 
-    public void cambiarContrasena(String nuevaContrasena, Usuario usuarioObjetivo){}
+    public abstract void cambiarContrasena(String nuevaContrasena, Usuario usuarioObjetivo);
 
     public String getName(){
         return this.name;
