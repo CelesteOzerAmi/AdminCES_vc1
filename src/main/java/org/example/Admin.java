@@ -27,6 +27,6 @@ public class Admin extends Usuario {
     @Override
     public String toString(){
         return this.getName() + " " + this.getLastName() +  ", " + this.getEmail()
-                + ", " + this.getCountry() + ".";
+                + ", " + this.getCountry() + ". Admin";
     }
 }
