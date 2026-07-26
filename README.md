@@ -42,12 +42,12 @@ El proyecto fue diseñado siguiendo principios SOLID y mejores prácticas de arq
 ## Instrucciones de Ejecución
 
 1. **Clonar el repositorio:**
-   git clone https://github.com/CelesteOzerAmi/AdminCES_vc1
-   cd nombre-repositorio
+   `git clone https://github.com/CelesteOzerAmi/AdminCES_vc1`
+   `cd AdminCES_vc1` 
 2. **Compilar el proyecto via terminal**
-    javac -d out src/org/example/*.java
-3. **Ejecutar la aplicaciòn**
-    java -cp out org.example.Main
+    `javac -d out src/org/example/*.java`
+3. **Ejecutar la aplicación**
+    `java -cp out org.example.Main`
 
 ---
 ## Diagrama UML ##
