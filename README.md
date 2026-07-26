@@ -13,4 +13,4 @@ B. Funcionalidades habiendo iniciado sesión.
   4. Eliminar usuario de tester: Permite eliminar un usuario de tester ya creado.
   5. Ver perfil: Permite ver el perfil propio, permitiendo editar datos. Restricciones: email a editar no puede existir en otro usuario. No permite modificar tipo de perfil. 
 
-<img width="4256" height="2016" alt="image" src="https://github.com/user-attachments/assets/c1f2e306-3f36-4627-8f89-36f40476ecdb" />
+<img width="1307" height="578" alt="vc5" src="https://github.com/user-attachments/assets/05a6682a-60d4-4b4d-9a77-10c19e225c3a" />
