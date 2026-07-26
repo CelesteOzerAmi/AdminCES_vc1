@@ -42,13 +42,14 @@ El proyecto fue diseñado siguiendo principios SOLID y mejores prácticas de arq
 ## Instrucciones de Ejecución
 
 1. **Clonar el repositorio:**
-   ```bash
-   git clone [https://github.com/tu-usuario/nombre-repositorio.git](https://github.com/tu-usuario/nombre-repositorio.git)
+   git clone https://github.com/CelesteOzerAmi/AdminCES_vc1
    cd nombre-repositorio
 2. **Compilar el proyecto via terminal**
     javac -d out src/org/example/*.java
 3. **Ejecutar la aplicaciòn**
     java -cp out org.example.Main
 
+---
+## Diagrama UML ##
 
 <img width="1453" height="893" alt="Diagrama sin título" src="https://github.com/user-attachments/assets/3dfc78fd-5e72-4252-826b-78af9ccf633b" />
