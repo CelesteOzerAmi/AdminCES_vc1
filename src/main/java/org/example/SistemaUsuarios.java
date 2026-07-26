@@ -7,14 +7,40 @@ import java.util.stream.Collectors;
 
 public class SistemaUsuarios {
 
-    public static Scanner scanner = new Scanner(System.in);
+    public Scanner scanner = new Scanner(System.in);
 
-    static List<Usuario> usuariosList = new ArrayList<>();
+    private static SistemaUsuarios instancia;
 
-    static Usuario usuarioLogin = null;
+    private final List<Usuario> usuariosList;
+
+    private Usuario usuarioLogin;
+
+    private SistemaUsuarios() {
+        this.usuariosList = new ArrayList<>();
+        this.usuarioLogin = null;
+    }
+
+    public static SistemaUsuarios getInstance() {
+        if (instancia == null) {
+            instancia = new SistemaUsuarios();
+        }
+        return instancia;
+    }
+
+    public boolean hayUsuarioLogueado() {
+        return this.usuarioLogin != null;
+    }
+
+    public boolean esAdminLogueado() {
+        return this.usuarioLogin instanceof Admin;
+    }
+
+    public boolean esTesterLogueado() {
+        return this.usuarioLogin instanceof Tester;
+    }
 
     // *** carga de usuarios *** //
-    static public void cargarUsuarios(){
+     public void cargarUsuarios(){
         usuariosList.add(new Admin("María", "Gonzalez", "maria.gonzalez@email.com", "Uruguay", "maria123"));
         usuariosList.add(new Admin("Diego", "Alvarez", "diego.alv@email.com", "Uruguay", "diego123"));
         usuariosList.add(new Tester("Martin", "Alvarez", "martin.alv@email.com", "Uruguay", "diego123", "junior"));
@@ -23,7 +49,7 @@ public class SistemaUsuarios {
     }
 
     // *** registro *** //
-    public static void registrarUsuario() throws EmailExisteException {
+    public  void registrarUsuario() throws EmailExisteException {
 
         String name = "";
         String lastName = "";
@@ -56,9 +82,14 @@ public class SistemaUsuarios {
         }
 
         String finalEmail = email;
-        Usuario userEmail = usuariosList.stream().filter(a -> a.getEmail().equalsIgnoreCase(finalEmail)).findFirst().orElse(null);
-        if(userEmail != null){
-            throw new EmailExisteException("Email ya se encuentra registrado");
+
+        try {
+            if(usuariosList.stream().anyMatch(u -> u.getEmail().equalsIgnoreCase(finalEmail))){
+                throw new EmailExisteException("Email ya registrado");
+            }
+        } catch (EmailExisteException e) {
+            System.out.println("Email ya registrado. Intente nuevamente con otro email");
+            return;
         }
 
         System.out.print("Ingrese contraseña (minimo 8 caracteres): ");
@@ -120,18 +151,20 @@ public class SistemaUsuarios {
     }
 
     // *** buscar usuario por email *** //
-    public static Usuario buscarUsuario(String email) throws UsuarioNoEncontradoException{
-        Usuario usuarioBuscado =  usuariosList.stream().filter(u -> u.getEmail().equals(email))
-                                                                                    .findFirst()
-                                                                                    .orElse(null);
-        if(usuarioBuscado == null){
-            throw new UsuarioNoEncontradoException("Usuario no encontrado");
+    public  Usuario buscarUsuario(String email) throws UsuarioNoEncontradoException{
+        try {
+            return usuariosList.stream().filter(u -> u.getEmail().equals(email))
+                   .findFirst()
+                   .orElseThrow(() -> new UsuarioNoEncontradoException("Usuario no encontrado"));
+        } catch (UsuarioNoEncontradoException e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Por favor, intente con otro correo.");
+            return null;
         }
-        return usuarioBuscado;
     }
 
     // *** buscar usuario por email *** //
-    public static void buscarUsuarioPorEmail() throws UsuarioNoEncontradoException {
+    public  void buscarUsuarioPorEmail() throws UsuarioNoEncontradoException {
         if(usuarioLogin == null || usuarioLogin instanceof Tester){
             System.out.println("Debe ser administrador para buscar usuarios");
             return;
@@ -143,17 +176,21 @@ public class SistemaUsuarios {
             System.out.println("Ingrese email del usuario | 0. Cancelar");
             email = scanner.nextLine();
         }
+
         if(email.equals("0")){
             System.out.println("Cancelando...");
             return;
         }
 
-        Usuario usuario = buscarUsuario(email);
-        System.out.println(usuario.toString());
+        Usuario usuarioEncontrado = buscarUsuario(email);
+        if(usuarioEncontrado != null){
+            System.out.println(usuarioEncontrado.toString());
+        }
+
     }
 
     // *** login *** //
-    public static void loginUsuario() throws UsuarioNoEncontradoException {
+    public  void loginUsuario() throws UsuarioNoEncontradoException {
         if(usuarioLogin != null){
             System.out.println("Usuario ya logueado");
             return;
@@ -162,6 +199,9 @@ public class SistemaUsuarios {
         System.out.print("Ingrese email: ");
         String email = scanner.nextLine();
         Usuario usuarioLog =  buscarUsuario(email);
+        if(usuarioLog == null){
+            return;
+        }
 
         System.out.print("Ingrese contraseña: ");
         String password = scanner.nextLine();
@@ -174,7 +214,7 @@ public class SistemaUsuarios {
     }
 
     // *** listado para ordenar usuarios por clase *** //
-    public static List<Usuario> obtenerUsuariosOrdenadosPorClase(List<Usuario> usuariosList) {
+    public  List<Usuario> obtenerUsuariosOrdenadosPorClase(List<Usuario> usuariosList) {
         return usuariosList.stream()
                 .sorted((u1, u2) -> {
                     if (u1 instanceof Admin) return -1;
@@ -185,7 +225,7 @@ public class SistemaUsuarios {
     }
 
     // *** ver usuarios *** //
-    public static void verUsuarios(){
+    public  void verUsuarios(){
         if(usuarioLogin == null || usuarioLogin instanceof Tester){
             System.out.println("Debe ser administrador para ver usuarios");
             return;
@@ -197,13 +237,17 @@ public class SistemaUsuarios {
     }
 
     // *** cambiar contraseña *** //
-    public static void ejecutarCambioDeContrasena() throws UsuarioNoEncontradoException {
+    public  void ejecutarCambioDeContrasena() throws UsuarioNoEncontradoException {
         Usuario usuarioObjetivo = null;
 
         if(usuarioLogin != null){
             System.out.println("Ingrese email del usuario");
             String emailUsuario = scanner.nextLine();
             usuarioObjetivo = buscarUsuario(emailUsuario);
+
+            if(usuarioObjetivo == null){
+                return;
+            }
 
             System.out.println("Ingrese nueva contraseña. Minimo 8 caracteres");
             String nuevaContrasenia = "";
@@ -234,9 +278,9 @@ public class SistemaUsuarios {
         if(usuarioLogin == null){
             System.out.println("Ingrese su email");
             String email = scanner.nextLine();
-            Usuario usuarioEmail = usuariosList.stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+            Usuario usuarioEmail = buscarUsuario(email);
             if(usuarioEmail == null){
-                throw new UsuarioNoEncontradoException("Usuario no encontrado");
+                return;
             }
             System.out.println("Confirme usuario");
             System.out.println(usuarioEmail.toString());
@@ -265,7 +309,7 @@ public class SistemaUsuarios {
     }
 
     // *** cambiar email *** //
-    public static void cambiarEmail() throws EmailExisteException {
+    public  void cambiarEmail() throws EmailExisteException {
         if(usuarioLogin instanceof Admin){
             System.out.println("Ingrese nuevo email");
             String nuevoEmail = scanner.nextLine();
@@ -286,7 +330,7 @@ public class SistemaUsuarios {
     }
 
     // *** cerrar sesión *** //
-    public static void cerrarSesion(){
+    public  void cerrarSesion(){
         if(usuarioLogin == null){
             System.out.println("Debe estar logueado para cerrar sesión");
             return;

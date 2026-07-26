@@ -9,21 +9,25 @@ public class Main {
 
     public static void main(String[] args) throws EmailExisteException, UsuarioNoEncontradoException {
 
+        SistemaUsuarios sistema = SistemaUsuarios.getInstance();
+        sistema.cargarUsuarios();
+
         int opcion = -1;
-        SistemaUsuarios.cargarUsuarios();
+        sistema.cargarUsuarios();
+
         while (opcion != 0){
             System.out.println("Seleccione una opcion");
-            if(SistemaUsuarios.usuarioLogin == null){
+            if(!sistema.hayUsuarioLogueado()){
                 System.out.println("1: Registro");
                 System.out.println("2: Login");
                 System.out.println("3: Cambiar contraseña");
                 System.out.println("0: Salir");
             }
-            if(SistemaUsuarios.usuarioLogin instanceof Tester){
+            if(sistema.esTesterLogueado()){
                 System.out.println("7: Cerrar sesión");
                 System.out.println("0: Salir");
             }
-            if(SistemaUsuarios.usuarioLogin instanceof Admin) {
+            if(sistema.esAdminLogueado()) {
                 System.out.println("1. Alta usuario tester");
                 System.out.println("3: Cambiar contraseña");
                 System.out.println("4: Cambiar email");
@@ -34,40 +38,40 @@ public class Main {
             }
 
             try {
-                opcion = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Opcion incorrecta. Intente nuevamente");
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Opción incorrecta. Ingrese un número.");
+                continue;
             }
-
 
             switch (opcion){
                 case 1:
                     System.out.println("Registro");
-                    SistemaUsuarios.registrarUsuario();
+                    sistema.registrarUsuario();
                     break;
                 case 2:
                     System.out.println("Login");
-                    SistemaUsuarios.loginUsuario();
+                    sistema.loginUsuario();
                     break;
                 case 3:
                     System.out.println("Cambiar contraseña");
-                    SistemaUsuarios.ejecutarCambioDeContrasena();
+                    sistema.ejecutarCambioDeContrasena();
                     break;
                 case 4:
                     System.out.println("Cambiar email");
-                    SistemaUsuarios.cambiarEmail();
+                    sistema.cambiarEmail();
                     break;
                 case 5:
                     System.out.println("Ver usuarios");
-                    SistemaUsuarios.verUsuarios();
+                    sistema.verUsuarios();
                     break;
                 case 6:
                     System.out.println("Buscar usuarios por email");
-                    SistemaUsuarios.buscarUsuarioPorEmail();
+                    sistema.buscarUsuarioPorEmail();
                     break;
                 case 7:
                     System.out.println("Cerrar sesión");
-                    SistemaUsuarios.cerrarSesion();
+                    sistema.cerrarSesion();
                     break;
                 case 0:
                     System.out.println("Salir");
